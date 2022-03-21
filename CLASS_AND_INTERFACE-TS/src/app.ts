@@ -1,5 +1,5 @@
-// Class
-class Department {
+// Abstract Class
+abstract class Department {
   static fiscalYear = "2020";
   // private readonly id: string;
   // name: string;
@@ -16,9 +16,7 @@ class Department {
     console.log(Department.fiscalYear); // こうする事で使用できる。
   }
 
-  describe(this: Department) {
-    console.log(`Department: (${this.id}): ${this.name}`);
-  }
+  abstract describe(this: Department): void;
 
   addEmployee(employee: string) {
     // this.id = "d2"; //　idはreadonlyなのでエラーになる。
@@ -37,10 +35,16 @@ class ITDepartment extends Department {
     super(id, "IT");
     this.admins = admins;
   }
+
+  describe() {
+    console.log("IT部門 - ID: " + this.id);
+  }
 }
 
+// Singleton pattern
 class AccountingDepartment extends Department {
   private lastReport: string;
+  private static instance: AccountingDepartment;
 
   get mostRecentReport() {
     if (this.lastReport) {
@@ -59,6 +63,14 @@ class AccountingDepartment extends Department {
   constructor(id: string, private reports: string[]) {
     super(id, "Accounting");
     this.lastReport = reports[0];
+  }
+
+  static getInstance() {
+    if (AccountingDepartment.instance) {
+      return this.instance;
+    }
+    this.instance = new AccountingDepartment("d2", []);
+    return this.instance;
   }
   // ベースクラスをオーバーライドできる
   describe() {
@@ -99,7 +111,10 @@ console.log(it);
 // const accountingCopy = { name: "DUMMY", describe: accounting.describe };
 // accountingCopy.describe();
 
-const accounting = new AccountingDepartment("d3", []);
+// const accounting = new AccountingDepartment("d3", []);
+const accounting = AccountingDepartment.getInstance();
+const accounting2 = AccountingDepartment.getInstance();
+console.log(accounting, accounting2);
 
 accounting.addReports("Something");
 accounting.mostRecentReport = "通期会計レポート";
